@@ -99,6 +99,8 @@ sudo dpkg-reconfigure -f noninteractive keyboard-configuration
 
 #fix slow SSH login
 echo 'UseDNS no' | sudo tee -a /etc/ssh/sshd_config
+#enable local ssh environment file
+echo 'PermitUserEnvironment yes' | sudo tee -a /etc/ssh/sshd_config
 
 #comment out session optional pam_motd.so
 sed -e 's/^\(session\s\+optional\s\+pam_motd.so\)/#\1/' /etc/pam.d/login | sudo tee /etc/pam.d/login
