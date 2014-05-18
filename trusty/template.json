@@ -1,21 +1,6 @@
 {
-  "provisioners": [
-    {
-      "type": "shell",
-      "scripts": [
-        "scripts/postinstall.sh"
-      ],
-      "override": {
-        "virtualbox-iso": {
-          "execute_command": "echo 'vagrant'|sudo -S sh '{{.Path}}'"
-        }
-      }
-    }
-  ],
-  "post-processors": ["vagrant"],
   "builders": [
     {
-      "type": "virtualbox-iso",
       "boot_command": [
         "<esc><esc><enter><wait>",
         "/install/vmlinuz noapic preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg <wait>",
@@ -26,19 +11,19 @@
         "initrd=/install/initrd.gz -- <enter><wait>"
       ],
       "boot_wait": "4s",
-      "disk_size": 13000,
+      "disk_size": 20000,
+      "guest_additions_path": "VBoxGuestAdditions.iso",
       "guest_os_type": "Ubuntu_64",
       "http_directory": "http",
       "iso_checksum": "01545fa976c8367b4f0d59169ac4866c",
       "iso_checksum_type": "md5",
       "iso_url": "http://releases.ubuntu.com/14.04/ubuntu-14.04-server-amd64.iso",
-      "ssh_username": "vagrant",
+      "shutdown_command": "echo 'shutdown -P now' > shutdown.sh; echo 'vagrant'|sudo -S sh 'shutdown.sh'",
       "ssh_password": "vagrant",
       "ssh_port": 22,
+      "ssh_username": "vagrant",
       "ssh_wait_timeout": "10000s",
-      "shutdown_command": "echo 'shutdown -P now' > shutdown.sh; echo 'vagrant'|sudo -S sh 'shutdown.sh'",
-      "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
-      "virtualbox_version_file": ".vbox_version",
+      "type": "virtualbox-iso",
       "vboxmanage": [
         [
           "modifyvm",
@@ -52,7 +37,26 @@
           "--cpus",
           "1"
         ]
-      ]
+      ],
+      "virtualbox_version_file": ".vbox_version",
+      "vm_name": "trusty"
+    }
+  ],
+  "post-processors": [
+    "vagrant"
+  ],
+  "provisioners": [
+    {
+      "override": {
+        "virtualbox-iso": {
+          "execute_command": "echo 'vagrant'|sudo -S sh '{{.Path}}'"
+        }
+      },
+      "scripts": [
+        "scripts/postinstall.sh"
+      ],
+      "type": "shell"
     }
   ]
 }
+

@@ -10,19 +10,16 @@ apt-get -y update
 apt-get -y upgrade
 apt-get -y install linux-headers-$(uname -r) build-essential
 apt-get -y install zlib1g-dev libssl-dev libreadline-gplv2-dev libyaml-dev libncurses5-dev libffi-dev libxml2-dev libxslt-dev
-apt-get -y install vim
-apt-get -y install git
-apt-get -y install ntp
+apt-get -y install vim git ntp ncdu nfs-common
 apt-get clean
 
 # Installing the virtualbox guest additions
 apt-get -y install dkms
-VBOX_VERSION=$(cat /home/vagrant/.vbox_version)
-mount -o loop VBoxGuestAdditions_$VBOX_VERSION.iso /mnt
+mount -o loop VBoxGuestAdditions.iso /mnt
 sh /mnt/VBoxLinuxAdditions.run
 umount /mnt
 
-rm VBoxGuestAdditions_$VBOX_VERSION.iso
+rm VBoxGuestAdditions.iso
 
 cd /tmp
 
@@ -36,9 +33,6 @@ sed -i -e 's/%admin ALL=(ALL) ALL/%admin ALL=NOPASSWD:ALL/g' /etc/sudoers
 # Add puppet user and group
 adduser --system --group --home /var/lib/puppet puppet
 
-# Install NFS client
-apt-get -y install nfs-common
-
 # Install ruby-install
 cd /home/vagrant
 wget -O ruby-install-0.4.3.tar.gz https://github.com/postmodern/ruby-install/archive/v0.4.3.tar.gz
@@ -47,9 +41,12 @@ cd ruby-install-0.4.3/
 sudo make install
 
 # Install ruby 1.9.3
-sudo ruby-install ruby 1.9.3-545
+sudo ruby-install ruby 1.9.3
 # Install ruby 2.1.2
 sudo ruby-install ruby 2.1.2
+
+# clean up ruby installations
+sudo rm -r /usr/local/src/ruby*
 
 cd /home/vagrant
 wget -O chruby-0.3.8.tar.gz https://github.com/postmodern/chruby/archive/v0.3.8.tar.gz
@@ -57,13 +54,13 @@ tar -xzvf chruby-0.3.8.tar.gz
 cd chruby-0.3.8/
 sudo make install
 
+sudo rm -f /home/vagrant/*.gz
+
 # Set default ruby
 echo "source /usr/local/share/chruby/chruby.sh \nchruby 2.1.2" | sudo tee /etc/profile.d/chruby.sh
 
 RUBYCMD="source /usr/local/share/chruby/chruby.sh && chruby 2.1.2"
 
-# Installing chef & Puppet
-#gem install chef --no-ri --no-rdoc
 sudo /bin/bash -c "$RUBYCMD && gem install puppet --no-ri --no-rdoc"
 
 # Installing vagrant keys
@@ -77,6 +74,8 @@ chown -R vagrant /home/vagrant/.ssh
 # Zero out the free space to save space in the final image:
 dd if=/dev/zero of=/EMPTY bs=1M
 rm -f /EMPTY
+
+apt-get clean
 
 # Removing leftover leases and persistent rules
 echo "cleaning up dhcp leases"
