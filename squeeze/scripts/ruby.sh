@@ -9,7 +9,11 @@ cd ruby-install-0.4.3/
 sudo make install
 
 # Install ruby 2.1.2
-ruby-install ruby stable
+ruby-install ruby 2.1.2
+
+# Cleanup source installation
+cd /usr/local/src
+sudo rm -r ruby-*
 
 cd /home/vagrant
 wget -O chruby-0.3.8.tar.gz https://github.com/postmodern/chruby/archive/v0.3.8.tar.gz
