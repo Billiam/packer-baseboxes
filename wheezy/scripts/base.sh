@@ -3,7 +3,7 @@ apt-get -y update
 apt-get -y install linux-headers-$(uname -r) build-essential
 apt-get -y install zlib1g zlib1g-dev libssl-dev libreadline6-dev
 apt-get -y install curl unzip
-apt-get -y install vim git ntp tmux
+apt-get -y install vim git ntp tmux ncdu
 apt-get clean
 
 # Set up sudo
