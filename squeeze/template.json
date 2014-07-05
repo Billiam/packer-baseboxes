@@ -1,28 +1,6 @@
 {
-  "provisioners": [
-    {
-      "type": "shell",
-      "scripts": [
-        "scripts/base.sh",
-        "scripts/vagrant.sh",
-        "scripts/virtualbox.sh",
-        "scripts/ruby.sh",
-        "scripts/cleanup-virtualbox.sh",
-        "scripts/cleanup.sh",
-        "scripts/zerodisk.sh",
-        "scripts/layout.sh"
-      ],
-      "override": {
-        "virtualbox-iso": {
-          "execute_command": "echo 'vagrant'|sudo -S sh '{{.Path}}'"
-        }
-      }
-    }
-  ],
-  "post-processors": ["vagrant"],
   "builders": [
     {
-      "type": "virtualbox-iso",
       "boot_command": [
         "<esc><wait>",
         "install <wait>",
@@ -39,20 +17,20 @@
         "console-keymaps-at/keymap=us <wait>",
         "<enter><wait>"
       ],
-      "boot_wait": "10s",
+      "boot_wait": "5s",
       "disk_size": 10140,
+      "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
       "guest_os_type": "Debian_64",
       "http_directory": "http",
       "iso_checksum": "9b08117cc235f3084948ab75a0f48861",
       "iso_checksum_type": "md5",
       "iso_url": "http://cdimage.debian.org/cdimage/archive/6.0.9/amd64/iso-cd/debian-6.0.9-amd64-netinst.iso",
-      "ssh_username": "vagrant",
+      "shutdown_command": "echo 'halt -p' > shutdown.sh; echo 'vagrant'|sudo -S sh 'shutdown.sh'",
       "ssh_password": "vagrant",
       "ssh_port": 22,
+      "ssh_username": "vagrant",
       "ssh_wait_timeout": "10000s",
-      "shutdown_command": "echo 'halt -p' > shutdown.sh; echo 'vagrant'|sudo -S sh 'shutdown.sh'",
-      "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
-      "virtualbox_version_file": ".vbox_version",
+      "type": "virtualbox-iso",
       "vboxmanage": [
         [
           "modifyvm",
@@ -66,7 +44,32 @@
           "--cpus",
           "1"
         ]
-      ]
+      ],
+      "virtualbox_version_file": ".vbox_version"
+    }
+  ],
+  "post-processors": [
+    "vagrant"
+  ],
+  "provisioners": [
+    {
+      "override": {
+        "virtualbox-iso": {
+          "execute_command": "echo 'vagrant'|sudo -S sh '{{.Path}}'"
+        }
+      },
+      "scripts": [
+        "scripts/base.sh",
+        "scripts/vagrant.sh",
+        "scripts/virtualbox.sh",
+        "scripts/ruby.sh",
+        "scripts/cleanup-virtualbox.sh",
+        "scripts/cleanup.sh",
+        "scripts/zerodisk.sh",
+        "scripts/layout.sh"
+      ],
+      "type": "shell"
     }
   ]
 }
+
